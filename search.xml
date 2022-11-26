@@ -4,6 +4,31 @@
   
     
     <entry>
+      <title>快速幂</title>
+      <link href="/archives/1599bffe.html"/>
+      <url>/archives/1599bffe.html</url>
+      
+        <content type="html"><![CDATA[<h2 id="算法介绍"><a href="#算法介绍" class="headerlink" title="算法介绍"></a>算法介绍</h2><p>快速幂，也成为二进制取幂（<strong><em>Binary Exponentiation</em></strong>），是一个在  $\omicron(\log n)$ 的时间内计算 $a^n$ 的小 <strong><em>trick</em></strong>，而暴力的方法需要 $\omicron(n)$ 的时间。</p><h2 id="基本思想"><a href="#基本思想" class="headerlink" title="基本思想"></a>基本思想</h2><p>计算 $a$ 的 $n$ 次方表示将 $n$ 个 $a$ 乘在一起：$a^n=\underbrace{a \times a \cdots \times a}_n$ ，然而当 $n$ 很大时，这种方法就比较慢了。不过我们知道，根据幂的性质，$a^{b+c}=a^b \times a^c$ ，$a^{2b}=a^b \times a^b=(a^b)^2$ 。快速幂的想法就是，我们将取幂的任务按照指数的 <strong><em>二进制表示</em></strong> ，以此来分割成更小的任务。</p><h2 id="求解过程"><a href="#求解过程" class="headerlink" title="求解过程"></a>求解过程</h2><p>我们首先举一个 $a^n$ 的具体的例子，并将 $n$ 表示为二进制：</p><script type="math/tex; mode=display">7^{12}=7^{(1100)_2}=7^8 \times 7^4</script><p>因为 $n$ 可以由 $\lfloor log_2 n \rfloor + 1$ 个二进制位来表示，我们可以观察上面的例子，这 $\lfloor log_2 n \rfloor + 1$ 个二进制位中有的位是 <strong><em>1</em></strong> ，有的位是 <strong><em>0</em></strong>，我们只需要把对应二进制位为 <strong><em>1</em></strong> 的整系数幂乘起来就行了。我们现在假设第 $i$ 位上的数为 <strong><em>1</em></strong>，那么很容易就可以得出一般化的形式：</p><script type="math/tex; mode=display">a^n=\prod_{i=0}^{\lfloor log_2 n \rfloor}a^{2^i}</script><p>需要注意我们是从 <strong><em>0</em></strong> 开始计算位数的，这样幂的性质和二进制的表示能完美地配合起来。因为至多需要把 $\lfloor log_2 n \rfloor + 1$ 个整系数幂乘起来，因此这个算法的时间复杂度是 $\omicron(\log n)$。</p><p>还有一个尾巴需要解决，我们还需要在每一步中计算出 $a^{2^i}$，这个其实非常容易解决。在我们迭代的过程中可以动态维护 $a^{2^i}$ 这个变量，并在常数时间内从 $a^{2^i}$ 推出 $a^{2^{i+1}}$:</p><script type="math/tex; mode=display">a^{2^i} \times a^{2^i} = a^{2^{i+1}}</script><h2 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h2><p>这里我们给出非递归的形式，根据上述推导得出的公式这并不难完成：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">long</span> <span class="type">long</span> <span class="title">quickPow</span><span class="params">(<span class="type">long</span> <span class="type">long</span> a, <span class="type">long</span> <span class="type">long</span> n)</span> </span>&#123;</span><br><span class="line">  <span class="type">long</span> <span class="type">long</span> ans = <span class="number">1</span>;</span><br><span class="line">  <span class="keyword">while</span> (n &gt; <span class="number">0</span>) &#123;</span><br><span class="line">    <span class="keyword">if</span> (n &amp; <span class="number">1</span>) ans *= a;</span><br><span class="line">    a *= a;</span><br><span class="line">    n &gt;&gt;= <span class="number">1</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> ans;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p><h2 id="实战指路"><a href="#实战指路" class="headerlink" title="实战指路"></a>实战指路</h2><p><a href="https://leetcode-cn.com/problems/sort-list/"><strong><em>Leetcode 50. Pow(x, n) (Medium)</em></strong></a></p><p>“<strong><em>Talk is cheap, show me the code!</em></strong>“<br>——<strong><em>Linus Benedict Torvalds</em></strong></p><p>这里给出我的实现代码:<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Solution</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">double</span> <span class="title">myPow</span><span class="params">(<span class="type">double</span> x, <span class="type">int</span> n)</span> </span>&#123;</span><br><span class="line">        <span class="type">double</span> res = <span class="number">1.0</span>;</span><br><span class="line">        <span class="type">bool</span> negative = <span class="literal">false</span>;</span><br><span class="line">        <span class="keyword">if</span> (n &lt; <span class="number">0</span>) &#123;</span><br><span class="line">            negative = <span class="literal">true</span>;</span><br><span class="line">            n = <span class="built_in">abs</span>(n);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">while</span> (n &gt; <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> (n &amp; <span class="number">1</span>) res *= x;</span><br><span class="line">            x *= x;</span><br><span class="line">            n &gt;&gt;= <span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> negative ? <span class="number">1</span> / res : res;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> Algorithm </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 快速幂 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>SocketLab3：SMTP</title>
       <link href="/archives/4f4fa075.html"/>
       <url>/archives/4f4fa075.html</url>
