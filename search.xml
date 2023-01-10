@@ -4,6 +4,31 @@
   
     
     <entry>
+      <title>计算机图形学二：观测变换（Viewing Transformation）</title>
+      <link href="/archives/a444eedd.html"/>
+      <url>/archives/a444eedd.html</url>
+      
+        <content type="html"><![CDATA[<p>本系列文章是按照 <a href="https://www.bilibili.com/video/BV1X7411F744/?spm_id_from=333.337.search-card.all.click&amp;vd_source=2652d832108fec04c7b16fcf850e5ca7"><strong><em>games101</em></strong></a> 上课讲授的内容编写的，相当于课后笔记，方便查漏补缺，<del>也方便实现代码时好抄公式</del> 。</p><hr><h2 id="观测变换"><a href="#观测变换" class="headerlink" title="观测变换"></a>观测变换</h2><p>什么是观测变换呢？我们可以从它的任务来说起：将虚拟世界中的三维物体映射（变换）到二维坐标中。说起来容易，但其实做起来还是有那么些复杂的，但是整个过程我们大概可以分为如下几个步骤：</p><ol><li><strong><em>模型变换（model tranformation）</em></strong>：这一步的目的是将模型空间转换到世界空间，说的直白点就是把模型都摆好位置，方便我们观察，不然的话读入多个模型时，很有可能大家都挤在原点的位置。</li><li><strong><em>视图/摄像机变换（view/camera tranformation）</em></strong>：其实这两种叫法指的都是一回事，为了上下文统一，本文采用的是视图变换这个名称。这一步的任务是将世界空间转换到观察空间，也就是摄影机找到一个好的位置，往某一个方向看去，此时我们就可以得到物体与摄像机的相对位置。</li><li><strong><em>投影变换（projection tranformation）</em></strong>：在视图变换之后，我们得到了所有可视范围内的物体相对于摄像机的相对位置坐标 $(x,y,z)$ ，在这一步种我们可以根据具体需求，选择正交投影或者是透视投影，将观察空间转换到裁剪空间。三维空间的物体被投影在标准的二维平面上 $[-1, 1]^2$ 上。这里对应的其实就是摄像机按快门的步骤。</li><li><strong><em>视口变换（viewport transformation）</em></strong>：在得到标准平面后，我们还需要根据所设定的屏幕分辨率映射到屏幕范围之内，即 $[-1, 1]^2 \rightarrow    [0, width] * [0, height]$。</li></ol><p>有了如上的说明之后，我们配合一个具体的例子来观看，来获得大致直观上的感受：<br><img src="https://anya-1308928365.cos.ap-nanjing.myqcloud.com/blog/v2-30da233abacca39a4cf87c28ed8e3e75_720w.webp" alt=""></p><p>另外，观测变换的前三个步骤更多时候会被一起讨论，称为 <strong><em>MVP</em></strong> 变换，其实就是取三个变换的首字母组成的。在 <strong><em>OpenGl</em></strong> 中，我们所需要做的其实也就是 <strong><em>MVP</em></strong> 变换，因为剩下的视口变换 <strong><em>OpenGl</em></strong> 默认帮我们完成了。接下来，我们就详细讨论这四个步骤具体做了什么。</p><h2 id="MVP变换"><a href="#MVP变换" class="headerlink" title="MVP变换"></a>MVP变换</h2><p><strong><em>MVP</em></strong> 变换用来描述观测变换的任务，即将虚拟世界中的三维物体映射（变换）到二维坐标中。</p><h3 id="模型变换"><a href="#模型变换" class="headerlink" title="模型变换"></a>模型变换</h3><p>关于模型变换其实非常简单，就是利用基础的矩阵变换将模型调整到世界当中合适的位置（旋转、缩放、平移）。</p><h3 id="视图变换"><a href="#视图变换" class="headerlink" title="视图变换"></a>视图变换</h3><p>如上文所说，视图变换的目的是得到所有可视物体与摄像机的相对位置。如何做呢，如果我们可以把物体和摄像机一起移动，让摄像机的坐标系与原来的标准世界坐标系重合，那么此时物体的坐标不就是与摄像机的相对坐标了吗？</p><p>那么现在的核心问题变成了如何表示摄像机的坐标系，并将其移动于原世界坐标系重合。首先我们定义三个东西：</p><ol><li><strong><em>摄像机或者眼睛位置（eye postion）: e</em></strong></li><li><strong><em>观察方向（gaze vector）: g</em></strong></li><li><strong><em>视点正上方向 （view-up vector）: t</em></strong></li></ol><p>需要注意的是，因为我们采用的是右手坐标系，而观察方向是朝着屏幕里面的，所以应该是负方向。现在，我们就可以定义我们的摄像机坐标系了：</p><script type="math/tex; mode=display">w = -\frac{g}{\Vert g \Vert} \quad u = \frac{t \times w}{\Vert t \times w \Vert} \quad v = w \times u</script><p>其中 $u，v，w$ 分别对应标准坐标系下的 $x，y，z$ ，示意图如下：<br><img src="https://anya-1308928365.cos.ap-nanjing.myqcloud.com/blog/v2-52b293df688294aa1d1ddbfc20428f38_720w.webp" alt=""><br>其中 $v$ 是 $t$ 的一个单位向量，这里画的不重合只是为了方便区分而已。那么接下来的任务就只差把这个坐标轴移到标准坐标系重合即可。</p><p>我们分两步走，第一步是把摄像机坐标轴的原点移到标准坐标轴原点，这个好办。第二步这是把摄像机的坐标轴摆成标准坐标轴的样子。</p><p>其实想一想，把摄像机的坐标轴摆成标准坐标轴的样子并没有那么简单，但是我们把标准坐标系摆成摄像机坐标系却十分简单。那么这两个变换之间其实就是一个逆矩阵的关系，最妙的是他们都是正交的，意味着这个矩阵的逆就是这个矩阵的转置！</p><script type="math/tex; mode=display">M_{view} = \begin{bmatrix}u & v & w & e\\0 & 0 & 0 & 1\\\end{bmatrix}^{-1}= \begin{bmatrix}x_u & y_u & z_u & 0\\x_v & y_v & z_v & 0\\x_w & y_w & z_w & 0\\0 & 0 & 0 & 1\\\end{bmatrix}\begin{bmatrix}1 & 0 & 0 & -x_e\\0 & 1 & 0 & -y_e\\0 & 0 & 1 & -z_e\\0 & 0 & 0 & 1\\\end{bmatrix}</script><p>可喜可贺，视图变换我们已经搞定了。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 计算机图形学 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> games101 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>字典树</title>
       <link href="/archives/eea60a6a.html"/>
       <url>/archives/eea60a6a.html</url>
