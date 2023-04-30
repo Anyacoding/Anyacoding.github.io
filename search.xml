@@ -4,6 +4,31 @@
   
     
     <entry>
+      <title>NavMeshAgent.velocity设置速度不生效问题</title>
+      <link href="/archives/23709f5e.html"/>
+      <url>/archives/23709f5e.html</url>
+      
+        <content type="html"><![CDATA[<h2 id="起因"><a href="#起因" class="headerlink" title="起因"></a>起因</h2><p>我原本的想法是通过直接修改 <strong><em>agent</em></strong> 的 <strong><em>velocity</em></strong> 来模拟怪物击退玩家的效果。结果是发现当怪物触发了击退的技能，玩家并没有被击退的效果，通过 <strong><em>Debug</em></strong> 后发现，是 <strong><em>agent</em></strong> 的 <strong><em>velocity</em></strong> 没有被正确赋值导致的：</p><figure class="highlight c#"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">kickOff</span>()</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (attackTarget != <span class="literal">null</span> &amp;&amp; transform.isFacingTarget(attackTarget.transform)) &#123;</span><br><span class="line">        transform.LookAt(attackTarget.transform);</span><br><span class="line">        Vector3 direction = (attackTarget.transform.position - transform.position).normalized;</span><br><span class="line">            </span><br><span class="line">        attackTarget.GetComponent&lt;NavMeshAgent&gt;().isStopped = <span class="literal">true</span>;</span><br><span class="line">        attackTarget.GetComponent&lt;NavMeshAgent&gt;().velocity = direction * kickForce;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 打印理论上应该设置的速度和agent实际的速度</span></span><br><span class="line">        Debug.Log(direction * kickForce);</span><br><span class="line">        Debug.Log(<span class="string">$&quot;agent: <span class="subst">&#123;attackTarget.GetComponent&lt;NavMeshAgent&gt;().velocity&#125;</span>&quot;</span>);</span><br><span class="line">            </span><br><span class="line">        attackTarget.GetComponent&lt;Animator&gt;().SetTrigger(<span class="string">&quot;Dizzy&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p><img src="https://anya-1308928365.cos.ap-nanjing.myqcloud.com/blog/debug.png" alt=""></p><p>这是在玩家静止状态下得到的结果，然而如果玩家是在移动状态下被击中，则可以正确触发击飞效果。</p><h2 id="解决办法"><a href="#解决办法" class="headerlink" title="解决办法"></a>解决办法</h2><p>在查阅了 <strong><em>Unity</em></strong> 官方手册后，我发现主要问题其实出在我勾选了 <strong><em>Auto Braking</em></strong> 这个选项：<br><img src="https://anya-1308928365.cos.ap-nanjing.myqcloud.com/blog/F~HX2TCJ20LNJA5CS0_EVMN.png" alt=""></p><p>当我们接近目标点时，启用该选项会让我们的 <strong><em>agent</em></strong> 处于静止状态，也就是速度为零。所以我们只需要禁用 <strong><em>Auto Braking</em></strong> 并把 <strong><em>Stopping Distance</em></strong> 设置为 <strong><em>0.7</em></strong> 或其他合适的数值，即可解决这个问题：<br><img src="https://anya-1308928365.cos.ap-nanjing.myqcloud.com/blog/auto barking.png" alt=""></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> Unity </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> NavMesh </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>MySQL应知应会（三）</title>
       <link href="/archives/559fab34.html"/>
       <url>/archives/559fab34.html</url>
