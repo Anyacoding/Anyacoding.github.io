@@ -4,6 +4,31 @@
   
     
     <entry>
+      <title>PlayerPrefs在Windows下的数据存储位置</title>
+      <link href="/archives/3a8a56f0.html"/>
+      <url>/archives/3a8a56f0.html</url>
+      
+        <content type="html"><![CDATA[<h2 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h2><p>在实现游戏场景切换的过程中，为了动态加载和保存玩家的数据，我使用了 <strong><em>ScriptableObject</em></strong> 搭配 <strong><em>PlayerPrefs</em></strong> 来实现数据的持久化。为了验证数据确实已经存储在本地磁盘上，我们需要知道 <strong><em>PlayerPrefs</em></strong> 的数据存储位置。</p><h2 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h2><p>通过阅读 <a href="https://docs.unity.cn/cn/2020.3/ScriptReference/PlayerPrefs.html"><strong><em>Unity</em></strong> 官方文档</a>，我们知道 <strong><em>PlayerPrefs</em></strong> 在 <strong><em>Windows</em></strong> 下的数据存储位置为：<br><img src="https://anya-1308928365.cos.ap-nanjing.myqcloud.com/blog/playerprefs.png" alt=""></p><p>但是这个路径其实需要打开注册表工具来查看，我们按下快捷键 <strong><em>Win + R</em></strong> 输入 <strong><em>regedit</em></strong>，打开注册表编辑器方能查看存储好的数据：<br><img src="https://anya-1308928365.cos.ap-nanjing.myqcloud.com/blog/zhucebiao.png" alt=""></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> Unity </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> PlayerPrefs </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>NavMeshAgent.velocity设置速度不生效问题</title>
       <link href="/archives/23709f5e.html"/>
       <url>/archives/23709f5e.html</url>
