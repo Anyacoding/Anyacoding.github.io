@@ -4,6 +4,31 @@
   
     
     <entry>
+      <title>Windows11 + Clion 环境下配置 Assimp</title>
+      <link href="/archives/6c4288c3.html"/>
+      <url>/archives/6c4288c3.html</url>
+      
+        <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>众所周知，在 <code>Winodws</code> 环境下编译并配置一个第三方库有多么蛋疼。纵使我已经写了不短时间的代码，每次遇到这种问题都会抓耳挠腮。由于我本人偏好 <code>Clion</code>，而网上大多的教程都是针对 <code>VS</code> 的，为了方便以后更换生产环境能够快速重新配置，并给跟我遇到同样问题的朋友一些帮助，故写文记录这次配置的过程。</p><h2 id="安装-Clion-和-MinGW"><a href="#安装-Clion-和-MinGW" class="headerlink" title="安装 Clion 和 MinGW"></a>安装 Clion 和 MinGW</h2><p>这一步我默认大部分朋友都是完成了，不然你也不会特地来搜索在 <code>Clion</code> 下配置的文章www。</p><p>以防万一还是贴一个 <code>Clion</code> 官方的链接： <a href="https://www.jetbrains.com/clion/download/#section=windows"><strong><em> https://www.jetbrains.com/clion/download/#section=windows </em></strong></a></p><p>你只需要傻瓜式下载后自动就会带有 <code>MinGW</code> 工具链。</p><h2 id="安装-CMake"><a href="#安装-CMake" class="headerlink" title="安装 CMake"></a>安装 CMake</h2><p>下载 <code>CMake</code> 也是傻瓜式安装，这里推荐把 <code>GUI</code> 版本的装上，对小白更加友好。</p><p>这里也贴上 <code>CMake</code> 的官方下载链接： <a href="https://cmake.org/download/"><strong><em> https://cmake.org/download/  </em></strong></a></p><h2 id="下载-Assimp-源码"><a href="#下载-Assimp-源码" class="headerlink" title="下载 Assimp 源码"></a>下载 Assimp 源码</h2><p>我这里推荐下载 <strong><em> 5.3.1 </em></strong> 版本，没有别的原因，因为我编译其他版本的代码都遇到了神秘错误，你的情况或许跟我不同，当出现问题时可以多尝试其他几个版本的源代码。</p><p>下载下图中红框圈出来的文件即可，下载链接为：<a href="https://github.com/assimp/assimp/releases"><strong><em> https://github.com/assimp/assimp/releases </em></strong></a></p><p><img src="https://anya-1308928365.cos.ap-nanjing.myqcloud.com/blog/assimp.png" alt=""></p><h2 id="解压缩-Assimp-源码，并确保是英文路径"><a href="#解压缩-Assimp-源码，并确保是英文路径" class="headerlink" title="解压缩 Assimp 源码，并确保是英文路径"></a>解压缩 Assimp 源码，并确保是英文路径</h2><p>如果路径中有中文会有奇怪的错误，并且保证 <strong><em> Winodws 路径中没有空格！！ </em></strong> </p><p>接下来以我的 <code>CMake</code> 界面举例子：</p><p><img src="https://anya-1308928365.cos.ap-nanjing.myqcloud.com/blog/cmake-assimp.png" alt=""><br><img src="https://anya-1308928365.cos.ap-nanjing.myqcloud.com/blog/mingw-assimp.png" alt=""></p><h2 id="编译-Assimp-源码"><a href="#编译-Assimp-源码" class="headerlink" title="编译 Assimp 源码"></a>编译 Assimp 源码</h2><p>在 <code>Assimp</code> 根目录下的那个我们新建的 <code>build</code> 文件夹下，打开你的控制台，运行:</p><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mingw32<span class="literal">-make</span> <span class="literal">-j8</span></span><br></pre></td></tr></table></figure><p><img src="https://anya-1308928365.cos.ap-nanjing.myqcloud.com/blog/ps-assimp.png" alt=""></p><p>等待编译进度到 <strong><em> 100% </em></strong> 就可以了，如果你在这个过程中不幸编译错误，需要你自行查看报错解决问题，或者干脆换一个版本的源码重新编译一下（泪目）</p><h2 id="编译完成后你需要的文件"><a href="#编译完成后你需要的文件" class="headerlink" title="编译完成后你需要的文件"></a>编译完成后你需要的文件</h2><p>你需要在 <code>build</code> 文件夹下找到以下三个文件：</p><p><img src="https://anya-1308928365.cos.ap-nanjing.myqcloud.com/blog/include-assimp.png" alt=""><br><img src="https://anya-1308928365.cos.ap-nanjing.myqcloud.com/blog/lib-assimp.png" alt=""><br><img src="https://anya-1308928365.cos.ap-nanjing.myqcloud.com/blog/dll-assimp.png" alt=""></p><p>你可以把 <code>config.h</code> 文件放到根目录的 <code>include</code> 文件夹内，如下图所示：</p><p><img src="https://anya-1308928365.cos.ap-nanjing.myqcloud.com/blog/include2-assimp.png" alt=""></p><h2 id="将库集成到你的-Clion-项目"><a href="#将库集成到你的-Clion-项目" class="headerlink" title="将库集成到你的 Clion 项目"></a>将库集成到你的 Clion 项目</h2><p>我这里用的是最暴力的方法，不整什么环境变量的幺儿子，直接将上文提到的根目录的 <code>include</code> 文件夹，以及 <code>libassimp-5.dll</code> 和 <code>libassimp.dll.a</code> 复制进项目中即可。如下图所示：</p><p><img src="https://anya-1308928365.cos.ap-nanjing.myqcloud.com/blog/clion-assimp.png" alt=""></p><p>对应的 <code>CMakeLists.txt</code> 为：</p><p><img src="https://anya-1308928365.cos.ap-nanjing.myqcloud.com/blog/cmakelist-assimp.png" alt=""></p><h2 id="动态库链接问题"><a href="#动态库链接问题" class="headerlink" title="动态库链接问题"></a>动态库链接问题</h2><p>最后不要忘记把 <code>libassimp-5.dll</code> 放在与 <code>.exe</code> 文件的同级目录下，不然会没有任何输出，这是解决动态库链接问题最直接的做法。</p><h2 id="效果展示"><a href="#效果展示" class="headerlink" title="效果展示"></a>效果展示</h2><p><img src="https://anya-1308928365.cos.ap-nanjing.myqcloud.com/blog/nano-assimp.png" alt=""></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> C/C++ </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 环境配置 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>forward的底层实现以及为什么需要有两个重载</title>
       <link href="/archives/ba3d353f.html"/>
       <url>/archives/ba3d353f.html</url>
